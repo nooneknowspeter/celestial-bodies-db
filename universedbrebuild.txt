@@ -1,0 +1,3 @@
+echo "rebuild db"
+
+psql -U freecodecamp -d universe -f ./universe.sql
