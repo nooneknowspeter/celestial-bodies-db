@@ -1,0 +1,123 @@
+echo "open psql terminal connect to db with username"
+psql --username=freecodecamp --dbname=postgres
+
+CREATE TABLE galaxy (
+  galaxy_id SERIAL PRIMARY KEY NOT NULL,
+  name VARCHAR(30) UNIQUE,
+  origin_name TEXT,
+  naked_eye_galaxy BOOLEAN,
+  constellation_id INT NOT NULL
+);
+
+INSERT INTO galaxy (name, origin_name, naked_eye_galaxy, constellation_id) 
+VALUES ('Milky Way', 'The appearance from Earth of the galaxy—a band of light', True, 1),
+('Andromeda Galaxy', 'Andromeda, which is shortened from "Andromeda Galaxy", gets its name from the area of the sky in which it appears, the constellation of Andromeda', True, 2),
+('Whirlpool Galaxy', 	'From the whirlpool appearance this gravitationally disturbed galaxy exhibits', False, 3),
+('Large Magellanic Cloud', 'Named after Ferdinand Magellan', True, 4),
+('Triangulum Galaxy', 	'Named after its location within the Triangulum constellation', True, 5),
+('UFO Galaxy', 'Named after its resemblance to a UFO', True, 6);
+
+ALTER TABLE galaxy ADD CONSTRAINT constellation_reference FOREIGN KEY (constellation_id) REFERENCES constellation(constellation_id);
+
+CREATE TABLE constellation (
+  constellation_id SERIAL PRIMARY KEY NOT NULL,
+  name VARCHAR(30) UNIQUE,
+  english_name TEXT,
+  area_sq_degrees NUMERIC(5,2),
+  galaxy_id INT NOT NULL
+);
+
+INSERT INTO constellation (name, english_name, area_sq_degrees, galaxy_id)
+VALUES ('Sagittarius', 'Archer', 867.43, 1),
+('Andromeda', 'Andromeda (Princess)', 722.28, 2),
+('Canes Venatici', 'Hunting Dogs', 465.19, 3),
+('Dorado', 'Dolphinfish', 179.17, 4),
+('Triangulum', 'Triangle	', 131.85, 5),
+('Lynx', 'Lynx', 545.39, 6);
+
+ALTER TABLE constellation ADD CONSTRAINT galaxy_reference FOREIGN KEY (galaxy_id) REFERENCES galaxy(galaxy_id);
+
+CREATE TABLE star (
+  star_id SERIAL PRIMARY KEY NOT NULL,
+  name VARCHAR(30) UNIQUE,
+  designation TEXT,
+  constellation_id INT NOT NULL,
+  galaxy_id INT NOT NULL
+);
+
+INSERT INTO star (name, designation, constellation_id, galaxy_id)
+VALUES('Sun', 'Sun', 1, 1),
+('Absolutno', 'XO-5', 6, 6),
+('Horna', 'HAT-P-38', 5, 5),
+('Naledi', 'WASP-62', 4, 4),
+('Chara', 'β Canum', 3, 3),
+('Mirach', 'β Andromedae', 2, 2);
+
+ALTER TABLE star ADD CONSTRAINT galaxy_reference FOREIGN KEY (galaxy_id) REFERENCES galaxy(galaxy_id);
+ALTER TABLE star ADD CONSTRAINT constellation_reference FOREIGN KEY (constellation_id) REFERENCES constellation(constellation_id);
+
+CREATE TABLE planet (
+  planet_id SERIAL PRIMARY KEY NOT NULL, 
+  name VARCHAR(30) UNIQUE,
+  equatorial_diameter_in_km INT,
+  is_habbitable BOOLEAN,
+  star_id INT NOT NULL
+);
+
+INSERT INTO planet (name, equatorial_diameter_in_km, is_habbitable, star_id)
+VALUES ('Mercury', 4879, False, 1),
+('Venus', 12102, True, 1),
+('Earth', 12756, True, 1),
+('Mars', 6794, True, 1),
+('Jupiter', 142984, False, 1),
+('Saturn', 120536, False, 1),
+('Uranus', 51118, False, 1),
+('Neptune', 49532, False, 1),
+('Pluto', 2360, False, 1),
+('Orcus', 958, False, 1),
+('Haumea', 1920, False, 1),
+('Quaoar', 1086, False, 1);
+
+ALTER TABLE planet ADD CONSTRAINT star_reference FOREIGN KEY (star_id) REFERENCES star(star_id);
+
+CREATE TABLE moon (
+  moon_id SERIAL PRIMARY KEY NOT NULL,
+  name VARCHAR(30) UNIQUE,
+  year_of_discovery INT,
+  mean_radius_km NUMERIC(10,3),
+  planet_id INT NOT NULL
+);
+
+INSERT INTO moon (name, year_of_discovery, mean_radius_km, planet_id)
+VALUES ('Moon', 1609, 1738, 3),
+('Phobos', 1877, 11.27, 4),
+('Deimos', 1877, 6.2, 4),
+('Io', 1610, 1821.6, 5),
+('Europa', 1610, 1560.8, 5),
+('Ganymede', 1610, 2634, 5),
+('Callisto', 1610, 2410, 5),
+('Amalthea', 1892, 83.5, 5),
+('Himalia', 1904, 69.8, 5),
+('Mimas', 1789, 198.2, 6),
+('Enceladus', 1789, 252.1, 6),
+('Tethys', 1684, 533.1, 6),
+('Dione', 1684, 561.4, 6),
+('Rhea', 1672, 763.8, 6),
+('Titan', 1655, 2574.73, 6),
+('Hyperion', 1848, 135, 6),
+('Iapetus', 1671, 735.6, 6),
+('Ariel', 1851, 578.9, 7),
+('Umbriel', 1851, 584.7, 7),
+('Titania', 1787, 788.9, 7),
+('Oberon', 1787, 761.4, 7),
+('Miranda', 1948, 235.8, 7),
+('Bianca', 1986, 25.7, 7),
+('Triton', 1846, 1353.4, 7),
+('Nereid', 1949, 178.5, 7),
+('Naiad', 1989, 30.2, 7),
+('Vanth', 2005, 221, 10),
+('Charon', 1978, 606, 9),
+('Hiʻiaka', 2005, 160, 11),
+('Weywot', 2006, 40.5, 12);
+
+ALTER TABLE moon ADD CONSTRAINT planet_reference FOREIGN KEY (planet_id) REFERENCES planet(planet_id);
